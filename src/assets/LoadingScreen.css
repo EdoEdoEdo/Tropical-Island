@@ -1,0 +1,175 @@
+/* 🎮 LOADING & START SCREEN */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('loading-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-out;
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+/* 📊 PROGRESS BAR */
+.progress-container {
+    margin: 3rem 0;
+}
+
+.progress-bar {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffffff, #ffd700);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.progress-text {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* 🎮 START BUTTON */
+.start-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.start-button {
+    background: rgba(255, 255, 255, 0.95);
+    color: #ff6b35;
+    border: none;
+    padding: 1.5rem 3.5rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    border-radius: 60px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.start-button:hover {
+    transform: translateY(-5px) scale(1.08);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    background: #ffffff;
+}
+
+.start-button:active {
+    transform: translateY(-2px) scale(1.04);
+}
+
+.start-icon {
+    font-size: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.start-hint {
+    margin-top: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    display: inline-block;
+}
+
+/* ✨ ANIMATIONS */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.15);
+    }
+}
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+    .loading-screen {
+        background-image: url('loading-bg-mobile.jpg'); /* ← IMMAGINE MOBILE! */
+        background-size: cover;
+        background-position: center;
+    }
+
+    .start-button {
+        padding: 1.2rem 2.5rem;
+        font-size: 1.1rem;
+    }
+
+    .start-hint {
+        font-size: 0.85rem;
+        padding: 0.6rem 1.2rem;
+    }
+
+    .progress-text {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .loading-screen {
+        background-image: url('loading-bg-mobile.jpg');
+    }
+
+    .start-button {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .start-hint {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+}
