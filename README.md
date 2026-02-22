@@ -4,7 +4,7 @@ An immersive 3D portfolio experience built with React Three Fiber. Explore a tro
 
 **Live demo:** [edoedoedo.it/experiments/tropical-island](https://www.edoedoedo.it/experiments/tropical-island/)
 
-![Tropical Island](./public/loading-bg.jpg)
+![Tropical Island](./assets/loading-bg.jpg)
 
 ---
 
