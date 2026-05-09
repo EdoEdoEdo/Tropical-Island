@@ -1,29 +1,32 @@
 import { useGLTF } from '@react-three/drei';
-import { useEffect } from 'react';
+import { memo, useMemo } from 'react';
 
 // GRASS - Ciuffo d'erba decorativo
-export const Grass = ({ position, scale = 1, rotation = 0 }) => {
+export const Grass = memo(({ position, scale = 1, rotation = 0 }) => {
     const { scene } = useGLTF('models/Grass.glb');
 
-    // Abilita ombre
-    useEffect(() => {
-        scene.traverse((child) => {
+    // Clona la scene una sola volta per istanza e abilita ombre.
+    // Solo receive: l'erba sottile produce shadow rumorose e costose.
+    const cloned = useMemo(() => {
+        const clone = scene.clone();
+        clone.traverse((child) => {
             if (child.isMesh) {
-                child.castShadow = true;
+                child.castShadow = false;
                 child.receiveShadow = true;
             }
         });
+        return clone;
     }, [scene]);
 
     return (
         <primitive
-            object={scene.clone()}
+            object={cloned}
             position={position}
             scale={scale}
             rotation={[0, rotation, 0]}
         />
     );
-};
+});
 
 // Preload
 useGLTF.preload('models/Grass.glb');

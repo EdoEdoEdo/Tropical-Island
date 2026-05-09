@@ -13,7 +13,7 @@ export const BackgroundMusic = () => {
         audioRef.current.loop = true;
         audioRef.current.volume = 0.2;
 
-        console.log('🎵 Audio element created');
+        if (import.meta.env.DEV) console.log('🎵 Audio element created');
 
         // Cleanup
         return () => {
@@ -32,11 +32,15 @@ export const BackgroundMusic = () => {
             audioRef.current
                 .play()
                 .then(() => {
-                    console.log('✅ Musica partita!');
+                    if (import.meta.env.DEV) console.log('✅ Musica partita!');
                     hasStartedRef.current = true;
                 })
-                .catch((err) => {
-                    console.log('⚠️ Autoplay bloccato, clicca sulla pagina');
+                .catch(() => {
+                    if (import.meta.env.DEV) {
+                        console.log(
+                            '⚠️ Autoplay bloccato, clicca sulla pagina',
+                        );
+                    }
 
                     // Handler per primo click
                     const handleClick = () => {
@@ -44,14 +48,18 @@ export const BackgroundMusic = () => {
                             audioRef.current
                                 .play()
                                 .then(() => {
-                                    console.log(
-                                        '✅ Musica partita dopo click!',
-                                    );
+                                    if (import.meta.env.DEV) {
+                                        console.log(
+                                            '✅ Musica partita dopo click!',
+                                        );
+                                    }
                                     hasStartedRef.current = true;
                                 })
-                                .catch((e) =>
-                                    console.error('❌ Play failed:', e),
-                                );
+                                .catch((e) => {
+                                    if (import.meta.env.DEV) {
+                                        console.error('❌ Play failed:', e);
+                                    }
+                                });
                         }
                         document.removeEventListener('click', handleClick);
                     };

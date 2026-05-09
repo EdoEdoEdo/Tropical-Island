@@ -1,13 +1,22 @@
-import { KeyboardControls } from '@react-three/drei';
+import { KeyboardControls, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { Physics } from '@react-three/rapier';
-import { Suspense, useState } from 'react';
-import { Experience } from './components/Experience';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { Joystick, JumpButton } from './components/Joystick';
 import { BackgroundMusic } from './components/BackgroundMusic';
 import { OceanSounds } from './components/OceanSounds';
 import { LoadingScreen } from './components/LoadingScreen';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Modal } from './components/Modal';
+import { Minimap } from './components/Minimap';
+import { Compass } from './components/Compass';
+import { OrbHuntHUD } from './components/OrbHuntHUD';
+import { CoconutGameHUD } from './components/CoconutGameHUD';
+import { SurfGameHUD } from './components/SurfGameHUD';
+import { FishingGameHUD } from './components/FishingGameHUD';
 import { useStore } from './components/useStore';
+
+// 🧱 Scena + Physics caricate solo dopo START → Rapier fuori dal bundle iniziale
+const Scene = lazy(() => import('./components/Scene'));
 
 export const Controls = {
     forward: 'forward',
@@ -17,65 +26,73 @@ export const Controls = {
     jump: 'jump',
 };
 
-// Virtual controls state per mobile
-export const mobileControls = {
-    forward: false,
-    back: false,
-    left: false,
-    right: false,
-    jump: false,
-};
+const JOYSTICK_THRESHOLD = 0.3;
 
 function App() {
-    const [, forceUpdate] = useState();
     const [started, setStarted] = useState(false);
-    const store = useStore();
+    const [sceneReady, setSceneReady] = useState(false);
+    const setAudioEnabled = useStore((s) => s.setAudioEnabled);
+    const setMobileControls = useStore((s) => s.setMobileControls);
+    const orbHuntStatus = useStore((s) => s.orbHunt.status);
+    const coconutStatus = useStore((s) => s.coconutGame.status);
+    const surfStatus = useStore((s) => s.surfGame.status);
+    const fishingStatus = useStore((s) => s.fishingGame.status);
+    const minigameActive =
+        orbHuntStatus === 'playing' ||
+        coconutStatus === 'playing' ||
+        surfStatus === 'playing' ||
+        fishingStatus === 'playing';
 
-    const handleJoystickMove = ({ x, y }) => {
-        // Reset controls
-        mobileControls.forward = false;
-        mobileControls.back = false;
-        mobileControls.left = false;
-        mobileControls.right = false;
+    // Traccia il progress globale dei loader drei (GLB, texture, ecc.)
+    const { active, progress } = useProgress();
 
-        // Threshold per evitare micro-movimenti
-        const threshold = 0.3;
-
-        if (Math.abs(y) > threshold) {
-            if (y > 0) {
-                mobileControls.forward = true;
-            } else {
-                mobileControls.back = true;
-            }
+    // Quando lo scene è montato e tutti gli asset sono caricati,
+    // marca sceneReady → smonta il LoadingScreen.
+    // Aspettiamo che la progress bar arrivi visivamente al 100% prima di nascondere.
+    useEffect(() => {
+        if (started && !active && progress === 100) {
+            const t = setTimeout(() => setSceneReady(true), 900);
+            return () => clearTimeout(t);
         }
+    }, [started, active, progress]);
 
-        if (Math.abs(x) > threshold) {
-            if (x > 0) {
-                mobileControls.right = true;
-            } else {
-                mobileControls.left = true;
-            }
-        }
+    const handleJoystickMove = useCallback(
+        ({ x, y }) => {
+            setMobileControls({
+                forward: y > JOYSTICK_THRESHOLD,
+                back: y < -JOYSTICK_THRESHOLD,
+                right: x > JOYSTICK_THRESHOLD,
+                left: x < -JOYSTICK_THRESHOLD,
+            });
+        },
+        [setMobileControls],
+    );
 
-        forceUpdate({});
-    };
+    const handleJump = useCallback(
+        (isPressed) => {
+            setMobileControls({ jump: isPressed });
+        },
+        [setMobileControls],
+    );
 
-    const handleJump = (isPressed) => {
-        mobileControls.jump = isPressed;
-        forceUpdate({});
-    };
-
-    const handleStart = () => {
+    const handleStart = useCallback(() => {
         setStarted(true);
-        // Abilita audio quando utente preme START
-        store.setAudioEnabled(true);
-        console.log('🎮 Experience started - Audio enabled');
-    };
+        setAudioEnabled(true);
+        if (import.meta.env.DEV) {
+            console.log('🎮 Experience started - Audio enabled');
+        }
+    }, [setAudioEnabled]);
 
     return (
-        <>
-            {/* 🎮 LOADING & START SCREEN */}
-            {!started && <LoadingScreen onStart={handleStart} />}
+        <ErrorBoundary>
+            {/* 🎮 LOADING & START SCREEN — visibile finché la scena non è pronta */}
+            {!sceneReady && (
+                <LoadingScreen
+                    onStart={handleStart}
+                    started={started}
+                    progress={progress}
+                />
+            )}
 
             <KeyboardControls
                 map={[
@@ -88,29 +105,47 @@ function App() {
             >
                 <Canvas
                     shadows
+                    dpr={[1, 1.75]}
+                    gl={{
+                        antialias: true,
+                        powerPreference: 'high-performance',
+                        toneMappingExposure: 1.35,
+                    }}
                     camera={{
                         position: [0, 20, -25],
                         fov: 60,
                     }}
                 >
                     <color attach="background" args={['#ffb088']} />
-                    {/* ← Pesca chiaro (era arancione scuro) */}
-                    <Suspense fallback={null}>
-                        <Physics gravity={[0, -20, 0]}>
-                            <Experience />
-                        </Physics>
-                    </Suspense>
+                    <Suspense fallback={null}>{started && <Scene />}</Suspense>
                 </Canvas>
             </KeyboardControls>
 
-            {/* Controlli Mobile */}
-            <Joystick onMove={handleJoystickMove} />
-            <JumpButton onJump={handleJump} />
+            {/* Controlli Mobile - nascosti durante i minigiochi (la pesca usa solo tap) */}
+            {sceneReady && !minigameActive && (
+                <>
+                    <Joystick onMove={handleJoystickMove} />
+                    <JumpButton onJump={handleJump} />
+                </>
+            )}
 
-            {/* 🎵 AUDIO - Fuori dal Canvas! */}
+            {/* UI flottante */}
+            {sceneReady && (
+                <>
+                    <Minimap />
+                    <Compass />
+                    <OrbHuntHUD />
+                    <CoconutGameHUD />
+                    <SurfGameHUD />
+                    <FishingGameHUD />
+                </>
+            )}
+            <Modal />
+
+            {/* 🎵 AUDIO ambient - Fuori dal Canvas! */}
             <BackgroundMusic />
             <OceanSounds />
-        </>
+        </ErrorBoundary>
     );
 }
 

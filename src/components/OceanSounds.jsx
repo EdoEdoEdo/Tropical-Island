@@ -13,7 +13,7 @@ export const OceanSounds = () => {
         audioRef.current.loop = true;
         audioRef.current.volume = 0.4;
 
-        console.log('🌊 Ocean audio element created');
+        if (import.meta.env.DEV) console.log('🌊 Ocean audio element created');
 
         // Cleanup
         return () => {
@@ -32,13 +32,15 @@ export const OceanSounds = () => {
             audioRef.current
                 .play()
                 .then(() => {
-                    console.log('✅ Onde partite!');
+                    if (import.meta.env.DEV) console.log('✅ Onde partite!');
                     hasStartedRef.current = true;
                 })
-                .catch((err) => {
-                    console.log(
-                        '⚠️ Autoplay onde bloccato, clicca sulla pagina',
-                    );
+                .catch(() => {
+                    if (import.meta.env.DEV) {
+                        console.log(
+                            '⚠️ Autoplay onde bloccato, clicca sulla pagina',
+                        );
+                    }
 
                     // Handler per primo click
                     const handleClick = () => {
@@ -46,12 +48,21 @@ export const OceanSounds = () => {
                             audioRef.current
                                 .play()
                                 .then(() => {
-                                    console.log('✅ Onde partite dopo click!');
+                                    if (import.meta.env.DEV) {
+                                        console.log(
+                                            '✅ Onde partite dopo click!',
+                                        );
+                                    }
                                     hasStartedRef.current = true;
                                 })
-                                .catch((e) =>
-                                    console.error('❌ Ocean play failed:', e),
-                                );
+                                .catch((e) => {
+                                    if (import.meta.env.DEV) {
+                                        console.error(
+                                            '❌ Ocean play failed:',
+                                            e,
+                                        );
+                                    }
+                                });
                         }
                         document.removeEventListener('click', handleClick);
                     };

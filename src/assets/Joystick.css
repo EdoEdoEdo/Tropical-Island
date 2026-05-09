@@ -1,19 +1,19 @@
 .joystick-container {
     position: fixed;
-    bottom: 40px;
-    left: 40px;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    left: calc(20px + env(safe-area-inset-left, 0px));
     z-index: 1000;
     display: none;
-    pointer-events: auto; /* <- AGGIUNTO */
+    pointer-events: auto;
 }
 
 .jump-button-container {
     position: fixed;
-    bottom: 40px;
-    right: 40px;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
     z-index: 1000;
     display: none;
-    pointer-events: auto; /* <- AGGIUNTO */
+    pointer-events: auto;
 }
 
 /* Mostra solo su touch devices */

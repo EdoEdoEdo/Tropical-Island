@@ -1,36 +1,29 @@
 import { useGLTF } from '@react-three/drei';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
-import { useEffect } from 'react';
 
-// Ombrellone
-export const Turtle = ({ position, scale = 1, rotation = 0 }) => {
+/**
+ * Tartaruga statica (decorativa, sulla sabbia).
+ */
+export const Turtle = ({
+    position = [35, 1.5, 25],
+    rotation = 0,
+    scale = 0.01,
+}) => {
     const { scene } = useGLTF('models/Turtle.glb');
-
-    // Abilita ombre
-    useEffect(() => {
-        scene.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
-    }, [scene]);
-
+    const rot = Array.isArray(rotation) ? rotation : [0, rotation, 0];
     return (
         <RigidBody
             type="fixed"
             position={position}
-            rotation={[0, rotation, 0]}
+            rotation={rot}
             colliders={false}
-            name="crab"
+            name="turtle"
         >
-            {/* Collider semplificato */}
-            <CuboidCollider args={[3, 1, 3]} />
-
+            {/* Carapace + corpo: cubo basso e largo, partendo dal terreno */}
+            <CuboidCollider args={[2.2, 1.4, 1.7]} position={[0, 0.3, 0]} />
             <primitive object={scene} scale={scale} />
         </RigidBody>
     );
 };
 
-// Preload
 useGLTF.preload('models/Turtle.glb');

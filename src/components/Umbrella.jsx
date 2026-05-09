@@ -25,7 +25,8 @@ export const Umbrella = ({ position, scale = 1, rotation = 0 }) => {
             name="umbrella"
         >
             {/* Collider semplificato (statua) */}
-            <CuboidCollider args={[1, 5, 1]} />
+            {/* Solo lo stelo dell'ombrellone (il telo non blocca) */}
+            <CuboidCollider args={[0.2, 3, 0.2]} position={[0, -2, 0]} />
 
             <primitive object={scene} scale={scale} />
         </RigidBody>

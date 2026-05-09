@@ -25,6 +25,9 @@ import { Info } from './Info';
 import { Grass } from './Grass';
 import { Torch } from './Torch';
 import { Grill } from './Grill';
+import { HotZone } from './HotZone';
+import { palmTrees, crabs, torches } from './islandLayout';
+import { StonePath } from './StonePath';
 
 // 🔧 DEV MODE - Imposta a false per produzione
 const SHOW_LEVA_CONTROLS = false;
@@ -94,105 +97,16 @@ export const Island = () => {
             {/* 🏝️ TERRENO COASTAL con Foam Shader */}
             <CoastalTerrain />
 
+            {/* 🪨 Sentiero di pietre poligonali al centro + 4 strade radiali */}
+            <StonePath />
+
             {/* 🌊 OCEANO con Perlin Noise Pattern */}
             <CoastalWater position={[0, 0.9, 0]} size={800} />
 
-            {/* 🌴 15 PALME GLB - Distribuite al centro, 3 varianti, con collisione */}
-            {/* ANELLO INTERNO - 5 palme molto vicine al centro */}
-            <PalmTree
-                position={[8, 4.7, 5]}
-                variant={1}
-                scale={2.4}
-                rotation={0.5}
-            />
-            <PalmTree
-                position={[-6, 5, -8]}
-                variant={2}
-                scale={2.2}
-                rotation={1.2}
-            />
-            <PalmTree
-                position={[10, 5, -6]}
-                variant={3}
-                scale={2.6}
-                rotation={2.1}
-            />
-            <PalmTree
-                position={[-9, 4.5, 7]}
-                variant={1}
-                scale={2.0}
-                rotation={0.8}
-            />
-            <PalmTree
-                position={[5, 5, -10]}
-                variant={2}
-                scale={2.4}
-                rotation={1.7}
-            />
-
-            {/* ANELLO MEDIO - 6 palme */}
-            <PalmTree
-                position={[15, 3.8, 10]}
-                variant={3}
-                scale={2.2}
-                rotation={0.3}
-            />
-            <PalmTree
-                position={[-14, 3.6, -12]}
-                variant={1}
-                scale={2.6}
-                rotation={1.9}
-            />
-            <PalmTree
-                position={[18, 3.9, -8]}
-                variant={2}
-                scale={2.0}
-                rotation={2.5}
-            />
-            <PalmTree
-                position={[-16, 3.7, 9]}
-                variant={3}
-                scale={2.4}
-                rotation={0.6}
-            />
-            <PalmTree
-                position={[12, 4.0, -15]}
-                variant={1}
-                scale={2.2}
-                rotation={1.4}
-            />
-            <PalmTree
-                position={[-10, 3.8, 14]}
-                variant={2}
-                scale={2.6}
-                rotation={2.8}
-            />
-
-            {/* ANELLO ESTERNO - 4 palme verso il bordo */}
-            <PalmTree
-                position={[22, 3.0, 15]}
-                variant={3}
-                scale={2.0}
-                rotation={0.9}
-            />
-            <PalmTree
-                position={[-20, 2.9, -18]}
-                variant={1}
-                scale={2.4}
-                rotation={1.6}
-            />
-            <PalmTree
-                position={[25, 3.1, -12]}
-                variant={2}
-                scale={2.2}
-                rotation={2.3}
-            />
-            <PalmTree
-                position={[-23, 2.8, 16]}
-                variant={3}
-                scale={2.6}
-                rotation={0.4}
-            />
+            {/* 🌴 PALME (15) - Layout in islandLayout.js */}
+            {palmTrees.map((p, i) => (
+                <PalmTree key={`palm-${i}`} {...p} />
+            ))}
 
             {/* 🚧 BARRIERA OCEANO - Muro invisibile nel mare */}
             <OceanBarrier radius={65} height={5} />
@@ -202,6 +116,15 @@ export const Island = () => {
                 position={[0, 3, 25]}
                 rotation={[0, Math.PI, 0]}
                 imageUrl="video/video_small.mp4"
+            />
+
+            {/* Hot zone cliccabile davanti al cinema */}
+            <HotZone
+                position={[0, 5, 22]}
+                args={[10, 6, 4]}
+                modal="cinema"
+                label="Guarda il video"
+                markerOffset={[0, 5, 0]}
             />
 
             {/* 🪑 Sedute - Nord */}
@@ -225,29 +148,35 @@ export const Island = () => {
 
             {/* 🗿 MOAI - Sud con ERBA alla base e 2 TORCE davanti */}
             <Moai position={[0, 7, -25]} rotation={Math.PI} scale={2.5} />
+            <HotZone
+                position={[0, 9, -22]}
+                modal="moai"
+                label="Parla col Moai"
+                markerOffset={[0, 2, 0]}
+            />
 
             {/* 🌿 Erba sotto il Moai */}
             <Grass position={[0, 4, -25]} scale={3} rotation={0} />
 
-            {/* 🔥 2 Torce davanti al Moai - simmetriche */}
-            <Torch position={[-4, 4.5, -19]} scale={2} rotation={Math.PI} />
-            <Torch position={[4, 4.5, -19]} scale={2} rotation={Math.PI} />
+            {/* 🔥 Torce davanti al Moai */}
+            {torches.map((t, i) => (
+                <Torch key={`torch-${i}`} {...t} />
+            ))}
 
             {/* 🦀 Granchi - Sud  */}
-            <Crab position={[7, 2.2, -40]} rotation={Math.PI} scale={0.0015} />
-            <Crab
-                position={[8, 2.3, -39]}
-                rotation={Math.PI / 1.1}
-                scale={0.0016}
-            />
-            <Crab
-                position={[9, 2.2, -40]}
-                rotation={Math.PI / 1.6}
-                scale={0.0014}
-            />
+            {crabs.map((c, i) => (
+                <Crab key={`crab-${i}`} {...c} />
+            ))}
 
             {/* 🏠 House - Est */}
             <House position={[-55, 2, 0]} rotation={Math.PI / 2} scale={0.02} />
+            <HotZone
+                position={[-42, 7, 0]}
+                modal="house"
+                label="Cabina"
+                revealDistance={12}
+                markerOffset={[0, 1.5, 0]}
+            />
 
             {/* 🪑 Table - Est */}
             <Table
@@ -270,11 +199,17 @@ export const Island = () => {
                 scale={0.02}
             />
 
-            {/* 🐢 Tartaruga - Est  */}
+            {/* 🐢 Tartaruga sulla sabbia */}
             <Turtle
-                position={[-35, 2.2, 27]}
+                position={[-35, 1.7, 27]}
                 rotation={Math.PI / 1.2}
                 scale={0.01}
+            />
+            <HotZone
+                position={[-35, 3.5, 27]}
+                modal="turtle"
+                label="Parla con la Tartaruga"
+                markerOffset={[0, 1, 0]}
             />
 
             {/* 🚣 Boat - Est */}
@@ -283,15 +218,41 @@ export const Island = () => {
                 rotation={Math.PI / 1.7}
                 scale={0.15}
             />
+            <HotZone
+                position={[-35, 3, -25]}
+                modal="fishing"
+                label="🎣 Pesca dalla barca"
+                markerOffset={[0, 1.5, 0]}
+            />
 
             {/* 🔥 Bonfire - Ovest */}
             <Bonfire position={[26, 3, 0]} rotation={Math.PI / 2} scale={8} />
+            <HotZone
+                position={[26, 6, 0]}
+                modal="bonfire"
+                label="Falò"
+                markerOffset={[0, 1.5, 0]}
+            />
+
+            {/* Acqua - hot zone in shore */}
+            <HotZone
+                position={[40, 3, 30]}
+                modal="water"
+                label="Oceano"
+                markerOffset={[0, 2, 0]}
+            />
 
             {/* 🏄 Surfboards - Ovest */}
             <SurfboardOne
                 position={[30, 5, 5]}
                 rotation={Math.PI / 1.3}
                 scale={0.15}
+            />
+            <HotZone
+                position={[30, 5, 5]}
+                modal="surf"
+                label="Surf Challenge"
+                markerOffset={[0, 1.5, 0]}
             />
             <SurfboardTwo
                 position={[32, 2, -7]}
@@ -306,7 +267,7 @@ export const Island = () => {
                 scale={0.015}
             />
 
-            {/* 🦜 Parrot + Info - Centro */}
+            {/* 🦜 Parrot appoggiato sulla lavagna Info */}
             <Parrot
                 position={[6.1, 9.5, 6.1]}
                 rotation={Math.PI / -1.3}
@@ -316,6 +277,15 @@ export const Island = () => {
                 position={[6, 4.9, 6]}
                 rotation={Math.PI / -1.3}
                 scale={2.5}
+            />
+
+            {/* Hot zone cliccabile sull'info board */}
+            <HotZone
+                position={[6, 5.5, 6]}
+                args={[3, 3, 3]}
+                modal="info"
+                label="Informazioni"
+                markerOffset={[0, 2.5, 0]}
             />
         </group>
     );

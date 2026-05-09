@@ -1,44 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useProgress } from '@react-three/drei';
 import '../assets/LoadingScreen.css';
 
-// 🎮 LOADING & START SCREEN
-export const LoadingScreen = ({ onStart }) => {
-    const { progress, active } = useProgress();
-    const [started, setStarted] = useState(false);
-    const [showStartButton, setShowStartButton] = useState(false);
-
-    useEffect(() => {
-        // Quando caricamento completo, mostra bottone START
-        if (!active && progress === 100) {
-            setTimeout(() => {
-                setShowStartButton(true);
-            }, 500);
-        }
-    }, [active, progress]);
-
-    const handleStart = () => {
-        setStarted(true);
-        // Chiamata callback dopo animazione fade
-        setTimeout(() => {
-            onStart();
-        }, 800);
-    };
-
-    // Nascondi completamente dopo start
+// 🎮 START + LOADING SCREEN
+// Mostra il bottone START prima del click; durante il caricamento della
+// scena 3D (dopo il click) mostra una progress bar reale.
+// Lo smontaggio è gestito da App.jsx quando sceneReady === true.
+export const LoadingScreen = ({ onStart, started, progress }) => {
     if (started) {
         return (
-            <div className={`loading-screen fade-out`}>
-                <div className="loading-content">{/* Fade out pulito */}</div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="loading-screen">
-            <div className="loading-content">
-                {/* 📊 PROGRESS BAR (durante caricamento) */}
-                {!showStartButton && (
+            <div className="loading-screen">
+                <div className="loading-content">
                     <div className="progress-container">
                         <div className="progress-bar">
                             <div
@@ -47,23 +17,30 @@ export const LoadingScreen = ({ onStart }) => {
                             />
                         </div>
                         <p className="progress-text">
-                            Loading... {Math.round(progress)}%
+                            Loading island… {Math.round(progress)}%
                         </p>
                     </div>
-                )}
+                </div>
+            </div>
+        );
+    }
 
-                {/* 🎮 START BUTTON (dopo caricamento) */}
-                {showStartButton && (
-                    <div className="start-container">
-                        <button className="start-button" onClick={handleStart}>
-                            <span className="start-icon">▶</span>
-                            START EXPERIENCE
-                        </button>
-                        <p className="start-hint">
-                            🎵 Audio enabled • WASD to move • Space to jump
-                        </p>
-                    </div>
-                )}
+    return (
+        <div className="loading-screen">
+            <div className="loading-content">
+                <div className="start-container">
+                    <button
+                        className="start-button"
+                        onClick={onStart}
+                        type="button"
+                    >
+                        <span className="start-icon">▶</span>
+                        START EXPERIENCE
+                    </button>
+                    <p className="start-hint">
+                        🎵 Audio enabled • WASD to move • Space to jump
+                    </p>
+                </div>
             </div>
         </div>
     );

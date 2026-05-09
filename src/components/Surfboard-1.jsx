@@ -24,8 +24,8 @@ export const SurfboardOne = ({ position, scale = 1, rotation = 0 }) => {
             colliders={false}
             name="sufrboard-one"
         >
-            {/* Collider semplificato (statua) */}
-            <CuboidCollider args={[1.0, 7.0, 1.0]} />
+            {/* Tavola da surf: lunga, sottile e bassa */}
+            <CuboidCollider args={[3.0, 0.3, 0.6]} />
 
             <primitive object={scene} scale={scale} />
         </RigidBody>

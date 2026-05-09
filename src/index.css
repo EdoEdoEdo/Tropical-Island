@@ -1,22 +1,267 @@
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body,
 #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family:
+        'Inter',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        'Roboto',
+        'Oxygen',
+        'Ubuntu',
+        'Cantarell',
+        'Fira Sans',
+        'Droid Sans',
+        'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 canvas {
-  display: block;
+    display: block;
+    touch-action: none; /* evita gesture scroll/zoom durante drag su mobile */
+}
+
+/* Reset safe-area iOS */
+@supports (padding: max(0px)) {
+    body {
+        padding: env(safe-area-inset-top) env(safe-area-inset-right)
+            env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+}
+
+/* Bottone reusable per HUD minigame (mobile-friendly tap target) */
+.minigame-exit-btn {
+    position: fixed;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    z-index: 110;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 3.4vw, 15px);
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+}
+.minigame-exit-btn:hover,
+.minigame-exit-btn:active {
+    background: rgba(220, 50, 50, 0.85);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ───── Minimap ───── */
+.minimap-wrap {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: calc(16px + env(safe-area-inset-left, 0px));
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    z-index: 100;
+    pointer-events: none;
+    font-family: system-ui, sans-serif;
+}
+
+.minimap-pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    border-radius: 50%;
+    border: 1.5px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+}
+.minimap-pin span {
+    transform: translateY(-0.5px);
+}
+
+.minimap-player {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition:
+        left 0.1s linear,
+        top 0.1s linear;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+}
+
+/* Nascondi minimap su touch device per non coprire il joystick */
+@media (hover: none) and (pointer: coarse) {
+    .minimap-wrap {
+        display: none;
+    }
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(-50%) scale(1.05);
+        opacity: 0.85;
+    }
+}
+
+/* ───── Hot zone marker ───── */
+.hotzone-marker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 4px;
+    border-radius: 999px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.2s ease;
+    user-select: none;
+}
+
+.hotzone-marker.near {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 153, 102, 0.95),
+        rgba(255, 99, 71, 0.92)
+    );
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    padding: 6px 12px 6px 10px;
+    box-shadow:
+        0 0 0 0 rgba(255, 153, 102, 0.6),
+        0 6px 20px rgba(0, 0, 0, 0.35);
+    animation:
+        hotzone-bounce 1.4s ease-in-out infinite,
+        hotzone-glow 2s ease-out infinite;
+}
+
+.hotzone-marker.near .hotzone-dot {
+    background: #fff;
+    animation: none;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
+}
+
+.hotzone-marker.near .hotzone-label {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.hotzone-marker.near .hotzone-key {
+    background: #fff;
+    color: #c43f1c;
+}
+
+.hotzone-marker:hover,
+.hotzone-marker.hovered {
+    transform: scale(1.08);
+}
+
+.hotzone-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff9966;
+    box-shadow: 0 0 0 0 rgba(255, 153, 102, 0.6);
+    animation: hotzone-pulse 1.6s ease-out infinite;
+    flex-shrink: 0;
+}
+
+.hotzone-marker.near .hotzone-dot {
+    background: #fff;
+    animation: none;
+    box-shadow: 0 0 8px rgba(255, 220, 150, 0.8);
+}
+
+.hotzone-label {
+    letter-spacing: 0.02em;
+}
+
+.hotzone-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: #ff9966;
+    color: #1a1a2e;
+    font-size: 11px;
+    font-weight: 800;
+    margin-left: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes hotzone-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 153, 102, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(255, 153, 102, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 153, 102, 0);
+    }
+}
+
+@keyframes hotzone-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes hotzone-glow {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(255, 200, 120, 0.7),
+            0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+    70% {
+        box-shadow:
+            0 0 0 18px rgba(255, 200, 120, 0),
+            0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(255, 200, 120, 0),
+            0 6px 20px rgba(0, 0, 0, 0.35);
+    }
 }
