@@ -293,4 +293,4 @@ Key zones:
 
 ## 📄 License
 
-MIT © [Edoardo](https://www.edoedoedo.it)
+MIT © [EDOEDOEDO](https://www.edoedoedo.it)
