@@ -384,50 +384,21 @@ export function SurfGameHUD() {
         return (
             <>
                 {fadeOverlay}
-                <div
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.75)',
-                        backdropFilter: 'blur(8px)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
-                        fontFamily: 'system-ui, sans-serif',
-                    }}
-                >
-                    <div
-                        style={{
-                            background: '#1a1a2e',
-                            color: '#fff',
-                            borderRadius: 16,
-                            padding: '2rem 3rem',
-                            textAlign: 'center',
-                            maxWidth: 420,
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                        }}
-                    >
-                        <h2 style={{ marginTop: 0 }}>🏄 Wipeout!</h2>
-                        <p style={{ opacity: 0.85, fontSize: 18 }}>
+                <div className="ui-overlay">
+                    <div className="ui-card ui-card--compact">
+                        <h2>🏄 Wipeout!</h2>
+                        <p style={{ fontSize: 17 }}>
                             Sei rimasto in equilibrio per{' '}
                             <strong>{score}s</strong>
                         </p>
-                        <p style={{ opacity: 0.6, fontSize: 13 }}>
+                        <div className="ui-card-stat">{score}s</div>
+                        <p className="ui-card-best">
                             🏆 Miglior tempo: {surf.bestScore}s
                         </p>
-                        <div
-                            style={{
-                                display: 'flex',
-                                gap: 12,
-                                justifyContent: 'center',
-                                marginTop: 20,
-                            }}
-                        >
+                        <div className="ui-btn-row">
                             <button
                                 type="button"
                                 onClick={() => {
-                                    // Riprova in mare: reset tilt locale e ricomincia
                                     tiltRef.current = 0;
                                     tiltVelRef.current = 0;
                                     dangerTimeRef.current = 0;
@@ -435,16 +406,14 @@ export function SurfGameHUD() {
                                     surfState.active = true;
                                     surfRetry();
                                 }}
-                                style={btnStyle(true)}
+                                className="ui-btn ui-btn--primary"
                             >
                                 Riprova
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    surfExit();
-                                }}
-                                style={btnStyle(false)}
+                                onClick={() => surfExit()}
+                                className="ui-btn ui-btn--ghost"
                             >
                                 Esci
                             </button>
@@ -485,16 +454,3 @@ const tapHintStyle = {
     pointerEvents: 'none',
     userSelect: 'none',
 };
-
-function btnStyle(primary) {
-    return {
-        background: primary ? '#ff9966' : 'rgba(255,255,255,0.1)',
-        border: 'none',
-        color: '#fff',
-        padding: '10px 20px',
-        borderRadius: 8,
-        fontWeight: 700,
-        fontSize: 14,
-        cursor: 'pointer',
-    };
-}

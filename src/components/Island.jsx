@@ -124,7 +124,7 @@ export const Island = () => {
                 args={[10, 6, 4]}
                 modal="cinema"
                 label="Guarda il video"
-                markerOffset={[0, 5, 0]}
+                markerOffset={[0, 2, 0]}
             />
 
             {/* 🪑 Sedute - Nord */}
@@ -149,10 +149,10 @@ export const Island = () => {
             {/* 🗿 MOAI - Sud con ERBA alla base e 2 TORCE davanti */}
             <Moai position={[0, 7, -25]} rotation={Math.PI} scale={2.5} />
             <HotZone
-                position={[0, 9, -22]}
+                position={[0, 6, -22]}
                 modal="moai"
                 label="Parla col Moai"
-                markerOffset={[0, 2, 0]}
+                markerOffset={[0, 0.5, 0]}
             />
 
             {/* 🌿 Erba sotto il Moai */}

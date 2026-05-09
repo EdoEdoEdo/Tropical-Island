@@ -9,6 +9,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Modal } from './components/Modal';
 import { Minimap } from './components/Minimap';
 import { Compass } from './components/Compass';
+import { Clock } from './components/Clock';
 import { OrbHuntHUD } from './components/OrbHuntHUD';
 import { CoconutGameHUD } from './components/CoconutGameHUD';
 import { SurfGameHUD } from './components/SurfGameHUD';
@@ -33,15 +34,12 @@ function App() {
     const [sceneReady, setSceneReady] = useState(false);
     const setAudioEnabled = useStore((s) => s.setAudioEnabled);
     const setMobileControls = useStore((s) => s.setMobileControls);
-    const orbHuntStatus = useStore((s) => s.orbHunt.status);
-    const coconutStatus = useStore((s) => s.coconutGame.status);
     const surfStatus = useStore((s) => s.surfGame.status);
     const fishingStatus = useStore((s) => s.fishingGame.status);
+    // Solo Surf e Fishing bloccano i controlli mobile (il personaggio è fermo o sulla tavola).
+    // OrbHunt e Coconut richiedono di camminare → il joystick deve restare visibile.
     const minigameActive =
-        orbHuntStatus === 'playing' ||
-        coconutStatus === 'playing' ||
-        surfStatus === 'playing' ||
-        fishingStatus === 'playing';
+        surfStatus === 'playing' || fishingStatus === 'playing';
 
     // Traccia il progress globale dei loader drei (GLB, texture, ecc.)
     const { active, progress } = useProgress();
@@ -134,6 +132,7 @@ function App() {
                 <>
                     <Minimap />
                     <Compass />
+                    <Clock />
                     <OrbHuntHUD />
                     <CoconutGameHUD />
                     <SurfGameHUD />

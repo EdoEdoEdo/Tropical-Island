@@ -17,6 +17,14 @@ export function CoconutGameHUD() {
         const danger = cg.timeLeft < 10;
         return (
             <>
+                <button
+                    type="button"
+                    className="minigame-exit-btn"
+                    onClick={resetCoconutGame}
+                    aria-label="Esci dal minigioco"
+                >
+                    ✕ Esci
+                </button>
                 <div
                     style={{
                         position: 'fixed',
@@ -77,56 +85,25 @@ export function CoconutGameHUD() {
 
     // ended
     return (
-        <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.75)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                fontFamily: 'system-ui, sans-serif',
-            }}
-        >
-            <div
-                style={{
-                    background: '#1a1a2e',
-                    color: '#fff',
-                    borderRadius: 16,
-                    padding: '2rem 3rem',
-                    textAlign: 'center',
-                    maxWidth: 420,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                }}
-            >
-                <h2 style={{ marginTop: 0 }}>🥥 Tempo scaduto!</h2>
-                <p style={{ opacity: 0.85, fontSize: 18 }}>
-                    Punteggio: <strong>{cg.score}</strong>
-                </p>
-                <p style={{ opacity: 0.6, fontSize: 13 }}>
+        <div className="ui-overlay">
+            <div className="ui-card ui-card--compact">
+                <h2>🥥 Tempo scaduto!</h2>
+                <div className="ui-card-stat">{cg.score}</div>
+                <p className="ui-card-best">
                     🏆 Miglior punteggio: {cg.bestScore}
                 </p>
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 12,
-                        justifyContent: 'center',
-                        marginTop: 20,
-                    }}
-                >
+                <div className="ui-btn-row">
                     <button
                         type="button"
                         onClick={startCoconutGame}
-                        style={btnStyle(true)}
+                        className="ui-btn ui-btn--primary"
                     >
                         Rigioca
                     </button>
                     <button
                         type="button"
                         onClick={resetCoconutGame}
-                        style={btnStyle(false)}
+                        className="ui-btn ui-btn--ghost"
                     >
                         Esci
                     </button>
@@ -134,17 +111,4 @@ export function CoconutGameHUD() {
             </div>
         </div>
     );
-}
-
-function btnStyle(primary) {
-    return {
-        background: primary ? '#ff9966' : 'rgba(255,255,255,0.1)',
-        border: 'none',
-        color: '#fff',
-        padding: '10px 20px',
-        borderRadius: 8,
-        fontWeight: 700,
-        fontSize: 14,
-        cursor: 'pointer',
-    };
 }

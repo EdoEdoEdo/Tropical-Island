@@ -472,42 +472,20 @@ export function FishingGameHUD() {
 
                 {/* TIMER + SCORE TOP */}
                 <div
+                    className="ui-pill"
                     style={{
                         position: 'fixed',
-                        top: 60,
+                        top: 'calc(60px + env(safe-area-inset-top, 0px))',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        background: 'rgba(0,0,0,0.65)',
-                        color: '#fff',
-                        padding: '8px 18px',
-                        borderRadius: 12,
-                        fontFamily: 'system-ui, sans-serif',
-                        fontWeight: 700,
-                        fontSize: 16,
-                        backdropFilter: 'blur(6px)',
-                        border: '1px solid rgba(255,255,255,0.2)',
                         zIndex: 100,
                         pointerEvents: 'none',
-                        display: 'flex',
-                        gap: 16,
                     }}
                 >
                     <span>🎣 {Math.ceil(fg.timeLeft)}s</span>
                     <span>⭐ {fg.score}</span>
                     <span>🐟 {fg.catches.length}</span>
                 </div>
-
-                {/* ESCI */}
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        endGame();
-                    }}
-                    style={exitBtnStyle}
-                >
-                    ✕ Esci
-                </button>
 
                 {/* HINT testuale per fase */}
                 {phase === 'aim' && (
@@ -571,23 +549,6 @@ export function FishingGameHUD() {
 }
 
 // === COMPONENTI UI ===
-
-const exitBtnStyle = {
-    position: 'fixed',
-    top: 60,
-    right: 16,
-    background: 'rgba(0,0,0,0.65)',
-    color: '#fff',
-    border: '1px solid rgba(255,255,255,0.25)',
-    padding: '8px 14px',
-    borderRadius: 10,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 700,
-    fontSize: 13,
-    cursor: 'pointer',
-    zIndex: 110,
-    backdropFilter: 'blur(6px)',
-};
 
 function Hint({ title, sub }) {
     return (
@@ -678,45 +639,75 @@ function BigButton({ text, sub, flash, onClick }) {
 
 function ReelHUD({ progress, timeLeft, tension, onClick }) {
     const danger = tension >= 0.75;
+    // Sweet zone: tap-rate ideale (40%-75% della barra)
+    const SWEET_MIN = 0.4;
+    const SWEET_MAX = 0.75;
     return (
         <>
-            {/* Barre */}
+            {/* Indicatore composito */}
             <div
                 style={{
                     position: 'fixed',
-                    bottom: 170,
+                    bottom: 'calc(180px + env(safe-area-inset-bottom, 0px))',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    width: 'min(420px, 80vw)',
+                    width: 'min(460px, 90vw)',
                     zIndex: 100,
                     pointerEvents: 'none',
-                    fontFamily: 'system-ui, sans-serif',
+                    fontFamily: 'var(--ui-font)',
+                    background: 'rgba(15, 18, 38, 0.78)',
+                    border: '1px solid var(--ui-border-strong)',
+                    borderRadius: 16,
+                    padding: '14px 16px 12px',
+                    backdropFilter: 'blur(10px) saturate(140%)',
+                    WebkitBackdropFilter: 'blur(10px) saturate(140%)',
+                    boxShadow: 'var(--ui-shadow-md)',
                 }}
             >
-                {/* Tensione lenza */}
+                {/* === Tensione lenza === */}
                 <div
                     style={{
-                        color: danger ? '#ff7766' : '#fff',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        color: danger ? '#ff8877' : 'rgba(255,255,255,0.85)',
                         fontSize: 12,
                         fontWeight: 700,
-                        marginBottom: 4,
-                        textAlign: 'center',
-                        textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        marginBottom: 6,
                     }}
                 >
-                    Tensione lenza {danger ? '⚠️' : ''}
+                    <span>Tensione lenza</span>
+                    <span style={{ fontSize: 14 }}>
+                        {danger ? '⚠️ Stai per spezzarla!' : ''}
+                    </span>
                 </div>
                 <div
                     style={{
                         position: 'relative',
-                        height: 14,
-                        background: 'rgba(0,0,0,0.5)',
-                        borderRadius: 7,
-                        border: '1px solid rgba(255,255,255,0.2)',
+                        height: 22,
+                        background: 'rgba(0,0,0,0.55)',
+                        borderRadius: 11,
+                        border: '1px solid rgba(255,255,255,0.15)',
                         overflow: 'hidden',
-                        marginBottom: 8,
+                        marginBottom: 12,
                     }}
                 >
+                    {/* Sweet zone (verde semi-trasparente) */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: `${SWEET_MIN * 100}%`,
+                            width: `${(SWEET_MAX - SWEET_MIN) * 100}%`,
+                            background:
+                                'repeating-linear-gradient(45deg, rgba(74,222,128,0.18) 0 6px, rgba(74,222,128,0.10) 6px 12px)',
+                            borderLeft: '1px dashed rgba(74,222,128,0.45)',
+                            borderRight: '1px dashed rgba(74,222,128,0.45)',
+                        }}
+                    />
                     {/* zona rossa critica */}
                     <div
                         style={{
@@ -726,9 +717,10 @@ function ReelHUD({ progress, timeLeft, tension, onClick }) {
                             bottom: 0,
                             width: '20%',
                             background:
-                                'linear-gradient(to left, rgba(220,50,50,0.5), transparent)',
+                                'linear-gradient(to left, rgba(255,85,102,0.55), transparent)',
                         }}
                     />
+                    {/* fill barra */}
                     <div
                         style={{
                             position: 'absolute',
@@ -737,33 +729,66 @@ function ReelHUD({ progress, timeLeft, tension, onClick }) {
                             left: 0,
                             width: `${Math.min(100, tension * 100)}%`,
                             background: danger
-                                ? 'linear-gradient(to right, #ff9966, #dc3232)'
-                                : 'linear-gradient(to right, #4caf50, #ffd633)',
-                            transition: 'width 0.08s, background 0.1s',
+                                ? 'linear-gradient(to right, #ff9966, #ff3355)'
+                                : 'linear-gradient(to right, #4ade80, #ffd633)',
+                            transition: 'width 0.08s linear, background 0.15s',
+                            boxShadow: danger
+                                ? '0 0 12px rgba(255,85,102,0.7)'
+                                : 'none',
+                        }}
+                    />
+                    {/* lancetta indicatore */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: -2,
+                            bottom: -2,
+                            left: `${Math.min(100, tension * 100)}%`,
+                            width: 3,
+                            marginLeft: -1.5,
+                            background: '#fff',
+                            boxShadow: '0 0 6px rgba(255,255,255,0.9)',
+                            transition: 'left 0.08s linear',
+                            borderRadius: 2,
                         }}
                     />
                 </div>
-
-                {/* Recupero */}
                 <div
                     style={{
-                        color: '#fff',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        marginBottom: 4,
+                        fontSize: 11,
+                        color: 'rgba(255,255,255,0.55)',
                         textAlign: 'center',
-                        textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                        marginTop: -8,
+                        marginBottom: 10,
+                        letterSpacing: '0.04em',
                     }}
                 >
-                    Recupero · {Math.ceil(timeLeft)}s
+                    Tieni la lancetta nella zona verde — troppi tap = snap
+                </div>
+
+                {/* === Recupero === */}
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        color: 'rgba(255,255,255,0.85)',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        marginBottom: 6,
+                    }}
+                >
+                    <span>Recupero</span>
+                    <span>{Math.ceil(timeLeft)}s</span>
                 </div>
                 <div
                     style={{
                         position: 'relative',
-                        height: 18,
-                        background: 'rgba(0,0,0,0.5)',
-                        borderRadius: 9,
-                        border: '1px solid rgba(255,255,255,0.2)',
+                        height: 14,
+                        background: 'rgba(0,0,0,0.55)',
+                        borderRadius: 7,
+                        border: '1px solid rgba(255,255,255,0.15)',
                         overflow: 'hidden',
                     }}
                 >
@@ -775,8 +800,9 @@ function ReelHUD({ progress, timeLeft, tension, onClick }) {
                             left: 0,
                             width: `${progress * 100}%`,
                             background:
-                                'linear-gradient(to right, #66ccff, #3399ff)',
+                                'linear-gradient(to right, #6dd5ff, #2a7fff)',
                             transition: 'width 0.1s',
+                            boxShadow: '0 0 10px rgba(76,195,255,0.5) inset',
                         }}
                     />
                 </div>
@@ -797,27 +823,42 @@ function CatchPopup({ popup, onContinue }) {
             <div
                 style={{
                     position: 'fixed',
-                    top: '40%',
+                    top: '38%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     textAlign: 'center',
-                    color: '#fff',
-                    fontFamily: 'system-ui, sans-serif',
+                    fontFamily: 'var(--ui-font)',
                     zIndex: 100,
                 }}
             >
                 <div
                     style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        borderRadius: 14,
-                        padding: '18px 28px',
-                        border: '2px solid #dc3232',
+                        background:
+                            'linear-gradient(155deg, var(--ui-bg-2), var(--ui-bg-1))',
+                        border: '1px solid rgba(255,85,102,0.5)',
+                        borderRadius: 16,
+                        padding: '20px 28px',
+                        boxShadow:
+                            '0 18px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,85,102,0.25) inset',
+                        color: '#fff',
                     }}
                 >
-                    <div style={{ fontSize: 42, fontWeight: 800 }}>
+                    <div
+                        style={{
+                            fontSize: 44,
+                            fontWeight: 800,
+                            letterSpacing: '-0.02em',
+                        }}
+                    >
                         💔 Persa!
                     </div>
-                    <div style={{ fontSize: 14, opacity: 0.9, marginTop: 4 }}>
+                    <div
+                        style={{
+                            fontSize: 14,
+                            opacity: 0.85,
+                            marginTop: 6,
+                        }}
+                    >
                         {popup.reason === 'spezzata'
                             ? 'Lenza spezzata — hai tirato troppo!'
                             : popup.reason === 'tempo'
@@ -828,19 +869,8 @@ function CatchPopup({ popup, onContinue }) {
                 <button
                     type="button"
                     onClick={onContinue}
-                    style={{
-                        marginTop: 12,
-                        background: '#3399ff',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px 22px',
-                        borderRadius: 10,
-                        fontWeight: 700,
-                        fontSize: 14,
-                        cursor: 'pointer',
-                        zIndex: 110,
-                        position: 'relative',
-                    }}
+                    className="ui-btn ui-btn--ocean"
+                    style={{ marginTop: 14, position: 'relative', zIndex: 110 }}
                 >
                     Rilancia
                 </button>
@@ -853,35 +883,56 @@ function CatchPopup({ popup, onContinue }) {
         <div
             style={{
                 position: 'fixed',
-                top: '40%',
+                top: '38%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 textAlign: 'center',
-                color: '#fff',
-                fontFamily: 'system-ui, sans-serif',
+                fontFamily: 'var(--ui-font)',
                 zIndex: 100,
             }}
         >
             <div
                 style={{
-                    background: 'rgba(0,0,0,0.7)',
-                    border: `2px solid ${color}`,
-                    borderRadius: 14,
-                    padding: '20px 32px',
-                    boxShadow: `0 0 30px ${color}66`,
+                    background:
+                        'linear-gradient(155deg, var(--ui-bg-2), var(--ui-bg-1))',
+                    border: `1px solid ${color}66`,
+                    borderRadius: 16,
+                    padding: '24px 32px',
+                    boxShadow: `0 0 40px ${color}55, 0 18px 48px rgba(0,0,0,0.5)`,
+                    color: '#fff',
+                    minWidth: 220,
                 }}
             >
-                <div style={{ fontSize: 64 }}>{f.emoji}</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color }}>
+                <div
+                    style={{
+                        fontSize: 64,
+                        filter: `drop-shadow(0 0 18px ${color})`,
+                    }}
+                >
+                    {f.emoji}
+                </div>
+                <div
+                    style={{
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color,
+                        letterSpacing: '-0.01em',
+                    }}
+                >
                     {f.name}
                 </div>
                 <div
                     style={{
-                        fontSize: 12,
-                        opacity: 0.85,
+                        display: 'inline-block',
+                        fontSize: 11,
+                        background: `${color}22`,
+                        color,
+                        padding: '3px 12px',
+                        borderRadius: 999,
                         textTransform: 'uppercase',
-                        letterSpacing: 1,
-                        marginTop: 4,
+                        letterSpacing: '0.12em',
+                        marginTop: 8,
+                        fontWeight: 700,
                     }}
                 >
                     {f.rarity} · +{f.score} pt
@@ -890,19 +941,8 @@ function CatchPopup({ popup, onContinue }) {
             <button
                 type="button"
                 onClick={onContinue}
-                style={{
-                    marginTop: 12,
-                    background: color,
-                    color: '#000',
-                    border: 'none',
-                    padding: '10px 22px',
-                    borderRadius: 10,
-                    fontWeight: 700,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    zIndex: 110,
-                    position: 'relative',
-                }}
+                className="ui-btn ui-btn--ocean"
+                style={{ marginTop: 14, position: 'relative', zIndex: 110 }}
             >
                 Rilancia
             </button>
@@ -919,44 +959,18 @@ function EndScreen({ fg, onRetry, onExit }) {
         { common: 0, rare: 0, epic: 0, legendary: 0 },
     );
     return (
-        <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.78)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                fontFamily: 'system-ui, sans-serif',
-            }}
-        >
-            <div
-                style={{
-                    background: '#1a1a2e',
-                    color: '#fff',
-                    borderRadius: 16,
-                    padding: '2rem 2.5rem',
-                    textAlign: 'center',
-                    maxWidth: 460,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                }}
-            >
-                <h2 style={{ marginTop: 0 }}>🎣 Fine pesca</h2>
-                <p style={{ fontSize: 28, fontWeight: 800, margin: '8px 0' }}>
-                    {fg.score} punti
-                </p>
-                <p style={{ opacity: 0.6, fontSize: 13, marginTop: 0 }}>
-                    🏆 Record: {fg.bestScore} pt
-                </p>
+        <div className="ui-overlay">
+            <div className="ui-card ui-card--compact">
+                <h2>🎣 Fine pesca</h2>
+                <div className="ui-card-stat">{fg.score} pt</div>
+                <p className="ui-card-best">🏆 Record: {fg.bestScore} pt</p>
 
                 <div
                     style={{
                         display: 'flex',
                         justifyContent: 'center',
                         gap: 16,
-                        margin: '12px 0',
+                        margin: '14px 0 6px',
                         flexWrap: 'wrap',
                     }}
                 >
@@ -965,9 +979,10 @@ function EndScreen({ fg, onRetry, onExit }) {
                             key={r}
                             style={{
                                 color: RARITY_COLORS[r],
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: 700,
                                 textTransform: 'capitalize',
+                                letterSpacing: '0.04em',
                             }}
                         >
                             {r}: {n}
@@ -993,10 +1008,10 @@ function EndScreen({ fg, onRetry, onExit }) {
                                 title={`${f.name} (+${f.score})`}
                                 style={{
                                     fontSize: 22,
-                                    border: `1px solid ${RARITY_COLORS[f.rarity]}`,
-                                    borderRadius: 6,
-                                    padding: '2px 6px',
-                                    background: 'rgba(255,255,255,0.05)',
+                                    border: `1px solid ${RARITY_COLORS[f.rarity]}66`,
+                                    borderRadius: 8,
+                                    padding: '2px 8px',
+                                    background: `${RARITY_COLORS[f.rarity]}15`,
                                 }}
                             >
                                 {f.emoji}
@@ -1005,25 +1020,18 @@ function EndScreen({ fg, onRetry, onExit }) {
                     </div>
                 )}
 
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 12,
-                        justifyContent: 'center',
-                        marginTop: 20,
-                    }}
-                >
+                <div className="ui-btn-row">
                     <button
                         type="button"
                         onClick={onRetry}
-                        style={endBtn(true)}
+                        className="ui-btn ui-btn--ocean"
                     >
                         Riprova
                     </button>
                     <button
                         type="button"
                         onClick={onExit}
-                        style={endBtn(false)}
+                        className="ui-btn ui-btn--ghost"
                     >
                         Esci
                     </button>
@@ -1031,17 +1039,4 @@ function EndScreen({ fg, onRetry, onExit }) {
             </div>
         </div>
     );
-}
-
-function endBtn(primary) {
-    return {
-        background: primary ? '#3399ff' : 'rgba(255,255,255,0.1)',
-        border: 'none',
-        color: '#fff',
-        padding: '10px 20px',
-        borderRadius: 8,
-        fontWeight: 700,
-        fontSize: 14,
-        cursor: 'pointer',
-    };
 }

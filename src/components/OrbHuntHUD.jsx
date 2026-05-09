@@ -68,62 +68,31 @@ export function OrbHuntHUD() {
     // won / lost → modale risultato
     const won = orbHunt.status === 'won';
     return (
-        <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.75)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                fontFamily: 'system-ui, sans-serif',
-            }}
-        >
-            <div
-                style={{
-                    background: '#1a1a2e',
-                    color: '#fff',
-                    borderRadius: 16,
-                    padding: '2rem 3rem',
-                    textAlign: 'center',
-                    maxWidth: 420,
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                }}
-            >
-                <h2 style={{ marginTop: 0 }}>
-                    {won ? '🎉 Hai vinto!' : '⏰ Tempo scaduto'}
-                </h2>
-                <p style={{ opacity: 0.85 }}>
+        <div className="ui-overlay">
+            <div className="ui-card ui-card--compact">
+                <h2>{won ? '🎉 Hai vinto!' : '⏰ Tempo scaduto'}</h2>
+                <p>
                     {won
                         ? `Hai raccolto tutte le ${orbHunt.target} sfere in ${fmtTime(180 - orbHunt.timeLeft)}.`
                         : `Hai raccolto ${orbHunt.collected} sfere su ${orbHunt.target}.`}
                 </p>
                 {orbHunt.bestTime !== null && (
-                    <p style={{ opacity: 0.6, fontSize: 13 }}>
+                    <p className="ui-card-best">
                         🏆 Miglior tempo: {fmtTime(orbHunt.bestTime)}
                     </p>
                 )}
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 12,
-                        justifyContent: 'center',
-                        marginTop: 20,
-                    }}
-                >
+                <div className="ui-btn-row">
                     <button
                         type="button"
                         onClick={startOrbHunt}
-                        style={btnStyle(true)}
+                        className="ui-btn ui-btn--primary"
                     >
                         Rigioca
                     </button>
                     <button
                         type="button"
                         onClick={resetOrbHunt}
-                        style={btnStyle(false)}
+                        className="ui-btn ui-btn--ghost"
                     >
                         Esci
                     </button>
@@ -131,17 +100,4 @@ export function OrbHuntHUD() {
             </div>
         </div>
     );
-}
-
-function btnStyle(primary) {
-    return {
-        padding: '10px 20px',
-        borderRadius: 8,
-        border: '1px solid rgba(255,255,255,0.2)',
-        background: primary ? '#ff9966' : 'rgba(255,255,255,0.1)',
-        color: '#fff',
-        fontWeight: 600,
-        fontSize: 14,
-        cursor: 'pointer',
-    };
 }

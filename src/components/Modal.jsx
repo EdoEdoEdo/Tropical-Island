@@ -5,7 +5,7 @@ import { playerState } from './playerState';
 /**
  * Modale HTML reso fuori dal Canvas.
  * Contenuto cambia in base a `modal` store: cinema | info | moai | house |
- * bonfire | water | parrot.
+ * bonfire | water | parrot | turtle | surf | fishing.
  */
 export function Modal() {
     const modal = useStore((s) => s.modal);
@@ -23,12 +23,12 @@ export function Modal() {
     if (!modal) return null;
 
     return (
-        <div onClick={closeModal} style={overlayStyle}>
-            <div onClick={(e) => e.stopPropagation()} style={cardStyle}>
+        <div onClick={closeModal} className="ui-overlay">
+            <div onClick={(e) => e.stopPropagation()} className="ui-card">
                 <button
                     onClick={closeModal}
                     aria-label="Chiudi"
-                    style={closeBtnStyle}
+                    className="ui-close"
                 >
                     ×
                 </button>
@@ -48,48 +48,9 @@ export function Modal() {
     );
 }
 
-const overlayStyle = {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.75)',
-    backdropFilter: 'blur(8px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: '2rem',
-    animation: 'fadeIn 0.25s ease',
-};
-
-const cardStyle = {
-    background: '#1a1a2e',
-    color: '#fff',
-    borderRadius: '16px',
-    maxWidth: 720,
-    width: '100%',
-    maxHeight: '85vh',
-    overflow: 'auto',
-    padding: '2rem',
-    fontFamily: 'system-ui, sans-serif',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-    position: 'relative',
-};
-
-const closeBtnStyle = {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    background: 'transparent',
-    border: 'none',
-    color: '#fff',
-    fontSize: '1.5rem',
-    cursor: 'pointer',
-    padding: '0.25rem 0.5rem',
-};
-
-function TechSection({ title, items }) {
+function TechSection({ items }) {
     return (
-        <ul style={{ lineHeight: 1.7, paddingLeft: '1.2rem' }}>
+        <ul className="ui-list">
             {items.map((it, i) => (
                 <li key={i}>{it}</li>
             ))}
@@ -100,13 +61,18 @@ function TechSection({ title, items }) {
 function CinemaContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🎬 Cinema sull'isola</h2>
+            <h2>🎬 Cinema sull'isola</h2>
             <video
                 src="video/video_small.mp4"
                 controls
                 autoPlay
                 loop
-                style={{ width: '100%', borderRadius: 8 }}
+                style={{
+                    width: '100%',
+                    borderRadius: 12,
+                    border: '1px solid var(--ui-border-strong)',
+                    boxShadow: 'var(--ui-shadow-md)',
+                }}
             />
             <h3>Come è fatto</h3>
             <TechSection
@@ -123,7 +89,7 @@ function CinemaContent() {
 function InfoContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🏝️ Tropical Island — Info</h2>
+            <h2>🏝️ Tropical Island — Info</h2>
             <p>
                 Esercizio di stile in <strong>React Three Fiber</strong>: scena
                 3D interattiva con ciclo giorno/notte, fisica, particelle e
@@ -136,7 +102,6 @@ function InfoContent() {
                     'Spazio: salta',
                     'E (vicino a un POI): interagisci',
                     'Mobile: joystick + tasto salto',
-                    'Pannello in alto a destra: cambia ora del giorno, FX, audio',
                 ]}
             />
             <h3>Stack</h3>
@@ -149,22 +114,24 @@ function InfoContent() {
                     'gltf-transform (compressione modelli -76%)',
                 ]}
             />
-            <p style={{ opacity: 0.7, marginTop: 16 }}>
+            <p style={{ marginTop: 18, fontSize: 13 }}>
                 Made by{' '}
                 <a
                     href="https://www.edoedoedo.it"
                     target="_blank"
                     rel="noreferrer"
-                    style={{ color: '#ff9966' }}
                 >
-                    Edoardo
+                    <strong>
+                        <em>
+                            <s>EDOEDOEDO</s>
+                        </em>
+                    </strong>
                 </a>
                 {' · '}
                 <a
-                    href="https://github.com/"
+                    href="https://github.com/EdoEdoEdo"
                     target="_blank"
                     rel="noreferrer"
-                    style={{ color: '#ff9966' }}
                 >
                     GitHub
                 </a>
@@ -180,44 +147,34 @@ function MoaiContent() {
     const handleStart = (e) => {
         e.stopPropagation();
         e.preventDefault();
-        // Chiudi il modal e poi avvia il game al prossimo tick
-        // (evita race con eventi di click in arrivo)
         closeModal();
         requestAnimationFrame(() => startOrbHunt());
     };
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🗿 Il Moai parla</h2>
+            <h2>🗿 Il Moai parla</h2>
             <p>
                 "Viaggiatore, l'isola nasconde{' '}
                 <strong>12 sfere luminose</strong>. Trovale tutte in 3 minuti se
                 vuoi guadagnarti il mio rispetto."
             </p>
             {bestTime !== null && (
-                <p style={{ opacity: 0.7 }}>
+                <p className="ui-card-best">
                     🏆 Il tuo miglior tempo: {Math.floor(bestTime / 60)}:
                     {String(bestTime % 60).padStart(2, '0')}
                 </p>
             )}
-            <button
-                type="button"
-                onClick={handleStart}
-                style={{
-                    background: '#ff9966',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '12px 24px',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    cursor: 'pointer',
-                    marginTop: 8,
-                }}
-            >
-                ⚡ Inizia la caccia alle sfere
-            </button>
+            <div className="ui-btn-row" style={{ marginTop: 8 }}>
+                <button
+                    type="button"
+                    onClick={handleStart}
+                    className="ui-btn ui-btn--primary ui-btn--lg"
+                >
+                    ⚡ Inizia la caccia alle sfere
+                </button>
+            </div>
 
-            <h3 style={{ marginTop: 24 }}>Tech del modello</h3>
+            <h3>Tech del modello</h3>
             <TechSection
                 items={[
                     'GLB ottimizzato con Meshopt: 165 KB → 21 KB (-87%)',
@@ -232,7 +189,7 @@ function MoaiContent() {
 function HouseContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🏠 La cabina</h2>
+            <h2>🏠 La cabina</h2>
             <p>
                 Una semplice cabina in legno con tetto rosso. Niente di
                 particolare dentro, ma il modello dimostra come gestire i{' '}
@@ -253,7 +210,7 @@ function HouseContent() {
 function BonfireContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🔥 Falò</h2>
+            <h2>🔥 Falò</h2>
             <p>
                 Un fuoco crepitante con fumo, scintille e audio 3D posizionale.
                 Ti scaldi a distanza grazie alla pointLight con decay.
@@ -273,7 +230,7 @@ function BonfireContent() {
 function WaterContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🌊 L'oceano</h2>
+            <h2>🌊 L'oceano</h2>
             <p>
                 L'acqua usa uno shader stilizzato custom con caustics, foam
                 animata e <strong>fake reflection</strong> del cielo (zero
@@ -298,7 +255,7 @@ function WaterContent() {
 function ParrotContent() {
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🦜 Il pappagallo</h2>
+            <h2>🦜 Il pappagallo</h2>
             <p>
                 Vola in cerchio sopra l'isola con altitudine variabile. Nessuna
                 AI complessa: solo trigonometria in <code>useFrame</code>.
@@ -306,12 +263,14 @@ function ParrotContent() {
             <h3>Codice</h3>
             <pre
                 style={{
-                    background: '#0d0d1f',
-                    padding: 12,
-                    borderRadius: 8,
+                    background: 'rgba(0,0,0,0.35)',
+                    border: '1px solid var(--ui-border)',
+                    padding: 14,
+                    borderRadius: 12,
                     overflow: 'auto',
-                    fontSize: 12,
-                    lineHeight: 1.5,
+                    fontSize: 12.5,
+                    lineHeight: 1.55,
+                    color: '#cfd6f5',
                 }}
             >{`useFrame(({ clock }) => {
   const t = clock.getElapsedTime() * speed;
@@ -320,7 +279,7 @@ function ParrotContent() {
   group.position.y = height + Math.sin(t * 2) * 1.5;
   group.rotation.y = -t + Math.PI;
 });`}</pre>
-            <p style={{ opacity: 0.7 }}>
+            <p>
                 Stesso pattern usato per la tartaruga (raggio maggiore, sopra
                 l'acqua) e i granchi (con waypoint random + flee dal player).
             </p>
@@ -340,37 +299,28 @@ function TurtleContent() {
     };
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🐢 La Tartaruga propone</h2>
+            <h2>🐢 La Tartaruga propone</h2>
             <p>
                 "Vedi quei cocchi che galleggiano nell'oceano? Lanciagli un
-                sasso!
-                <strong> Hai 2 minuti</strong> per centrarne più che puoi. Combo
-                se colpisci più cocchi di fila!"
+                sasso! <strong>Hai 2 minuti</strong> per centrarne più che puoi.
+                Combo se colpisci più cocchi di fila!"
             </p>
             {bestScore > 0 && (
-                <p style={{ opacity: 0.7 }}>
+                <p className="ui-card-best">
                     🏆 Miglior punteggio: {bestScore}
                 </p>
             )}
-            <button
-                type="button"
-                onClick={handleStart}
-                style={{
-                    background: '#ff9966',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '12px 24px',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    cursor: 'pointer',
-                    marginTop: 8,
-                }}
-            >
-                🥥 Lancia il sasso
-            </button>
+            <div className="ui-btn-row" style={{ marginTop: 8 }}>
+                <button
+                    type="button"
+                    onClick={handleStart}
+                    className="ui-btn ui-btn--primary ui-btn--lg"
+                >
+                    🥥 Lancia il sasso
+                </button>
+            </div>
 
-            <h3 style={{ marginTop: 24 }}>Tech del gioco</h3>
+            <h3>Tech del gioco</h3>
             <TechSection
                 items={[
                     'Raycast su un plane invisibile a livello del mare per intercettare il click/tap',
@@ -390,7 +340,6 @@ function SurfContent() {
     const handleStart = (e) => {
         e.stopPropagation();
         e.preventDefault();
-        // Salva la posizione corrente del player per restore a fine partita
         const savedPos = [playerState.x, playerState.y, playerState.z];
         const savedRotY = playerState.rotY;
         closeModal();
@@ -398,12 +347,12 @@ function SurfContent() {
     };
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🏄 Surf Challenge</h2>
+            <h2>🏄 Surf Challenge</h2>
             <p>
                 Sali sulla tavola e mantieni l'equilibrio il più a lungo
                 possibile! L'onda ti sbilancia, tu controbilanci con i tasti.
             </p>
-            <ul style={{ lineHeight: 1.7 }}>
+            <ul className="ui-list">
                 <li>
                     <strong>A / D</strong> o <strong>◀ / ▶</strong>: inclina la
                     tavola
@@ -416,27 +365,19 @@ function SurfContent() {
                 </li>
             </ul>
             {bestScore > 0 && (
-                <p style={{ opacity: 0.7 }}>🏆 Miglior tempo: {bestScore}s</p>
+                <p className="ui-card-best">🏆 Miglior tempo: {bestScore}s</p>
             )}
-            <button
-                type="button"
-                onClick={handleStart}
-                style={{
-                    background: '#ff9966',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '12px 24px',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    cursor: 'pointer',
-                    marginTop: 8,
-                }}
-            >
-                🏄 Sali sulla tavola
-            </button>
+            <div className="ui-btn-row" style={{ marginTop: 8 }}>
+                <button
+                    type="button"
+                    onClick={handleStart}
+                    className="ui-btn ui-btn--primary ui-btn--lg"
+                >
+                    🏄 Sali sulla tavola
+                </button>
+            </div>
 
-            <h3 style={{ marginTop: 24 }}>Tech del gioco</h3>
+            <h3>Tech del gioco</h3>
             <TechSection
                 items={[
                     'Sistema fisico semplificato 1D: tilt come random-walk + input + damping',
@@ -463,13 +404,13 @@ function FishingContent() {
     };
     return (
         <>
-            <h2 style={{ marginTop: 0 }}>🎣 Pesca dalla riva</h2>
+            <h2>🎣 Pesca dalla riva</h2>
             <p>
                 Lancia l'esca nel mare, aspetta che il galleggiante affondi,
                 aggancia il pesce al volo e ritiralo a riva. Più punti possibili
                 in 90s!
             </p>
-            <ul style={{ lineHeight: 1.7 }}>
+            <ul className="ui-list">
                 <li>
                     <strong>Click / tap</strong> sul mare: lancia l'esca
                 </li>
@@ -485,29 +426,21 @@ function FishingContent() {
                 <li>Pesci più rari = più punti, ma più tap necessari</li>
             </ul>
             {bestScore > 0 && (
-                <p style={{ opacity: 0.7 }}>
+                <p className="ui-card-best">
                     🏆 Miglior punteggio: {bestScore} pt
                 </p>
             )}
-            <button
-                type="button"
-                onClick={handleStart}
-                style={{
-                    background: '#3399ff',
-                    border: 'none',
-                    color: '#fff',
-                    padding: '12px 24px',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    cursor: 'pointer',
-                    marginTop: 8,
-                }}
-            >
-                🎣 Vai a pescare
-            </button>
+            <div className="ui-btn-row" style={{ marginTop: 8 }}>
+                <button
+                    type="button"
+                    onClick={handleStart}
+                    className="ui-btn ui-btn--ocean ui-btn--lg"
+                >
+                    🎣 Vai a pescare
+                </button>
+            </div>
 
-            <h3 style={{ marginTop: 24 }}>Tech del gioco</h3>
+            <h3>Tech del gioco</h3>
             <TechSection
                 items={[
                     'Macchina a stati: aim → flight → waiting → bite → reeling → caught/lost',
